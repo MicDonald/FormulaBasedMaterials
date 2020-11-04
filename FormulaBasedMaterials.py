@@ -41,7 +41,7 @@ class SingleFormulaBasedMaterials:
 
         return f(_x*np.pi*2/self.__a[0],_y*np.pi*2/self.__a[1],_z*np.pi*2/self.__a[2])
     
-    def __init__(self, unit='random', l=10, r=[1,1,1], a=[1,1,1], eps=0.1, res=0.1, png=True, smooth=True):
+    def __init__(self, unit=None, formula = None, l=10, r=[1,1,1], a=[1,1,1], eps=0.1, res=0.1, png=True, smooth=True):
         
         self.__l = l
         self.__r = r
@@ -57,8 +57,11 @@ class SingleFormulaBasedMaterials:
             self.__formula = self.__SchD()
         elif unit == 'random':
             self.__formula = self.__randomFormulaString()
+        elif formula:
+            self.__formula = formula
+            unit = 'user-defined'
         else:
-            raise NameError('No such unit')
+            raise NameError('Please input user-defined formula')
             
         rx,ry,rz = self.__r
         _res=int(self.__l/self.__res)
