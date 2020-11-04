@@ -33,8 +33,6 @@ class SingleFormulaBasedMaterials:
 
     def __formula_string(self, _x,_y,_z):
         f = sympify(self.__formula)
-        print('Using formula:', f)
-
         from sympy.abc import x, y, z
         from sympy.utilities.lambdify import lambdify
         f = lambdify([x,y,z], f, 'numpy')
@@ -62,7 +60,7 @@ class SingleFormulaBasedMaterials:
             unit = 'user-defined'
         else:
             raise NameError('Please input user-defined formula')
-            
+        print('Using formula:', self.__formula)
         rx,ry,rz = self.__r
         _res=int(self.__l/self.__res)
         _x=np.array([i for i in range(_res*rx)])
@@ -85,10 +83,10 @@ class SingleFormulaBasedMaterials:
         _x, _y, _z = np.meshgrid(_x/_res, _y/_res, _z/_res, indexing='ij')
         self.__vox = np.fabs(self.__formula_string(_x,_y,_z))<=self.__eps
         self.__porosity = 1-(np.sum(self.__vox)/self.__vox.size)
-        while np.abs(self.get_porosity() - 1)<1e-9:
+        while self.__porosity > 0.99:
             self.__eps+=0.001
             self.update_eps(self.__eps)
-            print('Didn\'t find matched material with {} and {}. Automatically use higher eps'.format(self.__formula, self.__eps))
+            print('Finding matched material, but porosity: {} is too high. Update eps with {}'.format(self.__porosity, self.__eps))
 
     def update_eps(self, eps):
 
@@ -165,8 +163,7 @@ if __name__=='__main__':
         eps=args.eps
         smooth=args.smooth
         png=args.png
-        formula=randomFormulaString()
-        fBM=formulaBasedMaterials(unit, l, r, a, eps, res, png, smooth)
-        fBM.save2stl()
+        SFBM=SingleFormulaBasedMaterials(unit, l, r, a, eps, res, png, smooth)
+        SFBM.save2stl()
     except:
         pass
