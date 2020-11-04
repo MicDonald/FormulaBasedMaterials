@@ -2,6 +2,7 @@
 Generate Formula-Based Materials into Voxel, STL files
 
 # Usage:
+```python
 import matplotlib.pyplot as plt
 %matplotlib inline
 import FormulaBasedMaterials as FBM
@@ -11,3 +12,4 @@ test_SingleFM=FBM.SingleFormulaBasedMaterials(unit='random', l=10, r=[1,1,1], a=
 test_SingleFM=FBM.SingleFormulaBasedMaterials(unit='SchD', l=10, r=[1,1,1], a=[1,1,1], eps=0.2, res=0.2, png=True, smooth=True)
 test_SingleFM=FBM.SingleFormulaBasedMaterials(unit='gyroid', l=10, r=[1,1,1], a=[1,1,1], eps=0.2, res=0.2, png=True, smooth=True)
 test_SingleFM.save2stl()
+```
