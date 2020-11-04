@@ -44,6 +44,7 @@ class SingleFormulaBasedMaterials:
     def __init__(self, unit='random', l=10, r=[1,1,1], a=[1,1,1], eps=0.1, res=0.1, png=True, smooth=True):
         
         self.__l = l
+        self.__r = r
         self.__a = a
         self.__eps = eps
         self.__res = res 
@@ -59,7 +60,7 @@ class SingleFormulaBasedMaterials:
         else:
             raise NameError('No such unit')
             
-        rx,ry,rz=r
+        rx,ry,rz = self.__r
         _res=int(self.__l/self.__res)
         _x=np.array([i for i in range(_res*rx)])
         _y=np.array([i for i in range(_res*ry)])
@@ -69,17 +70,36 @@ class SingleFormulaBasedMaterials:
         ly=len(_y)
         lz=len(_z)
         
-        if type(eps)==float:
-            eps=np.ones((lx,ly,lz))*eps
-            self.__model = unit+'_'+str(rx)+'x'+str(ry)+'x'+str(rz)+'_r'+str(round(res,2))+'_e'+str(round(np.average(eps),2))
+        if type(self.__eps)==float:
+ 
+            self.__model = unit+'_'+str(rx)+'x'+str(ry)+'x'+str(rz)+'_r'+str(round(res,2))
         elif np.sum(eps/np.max(eps)-np.ones(eps.shape))==0:
-            eps=np.ones((lx,ly,lz))*eps
-            self.__model = unit+'_'+str(rx)+'x'+str(ry)+'x'+str(rz)+'_r'+str(round(res,2))+'_e'+str(round(np.average(eps),2))
+
+            self.__model = unit+'_'+str(rx)+'x'+str(ry)+'x'+str(rz)+'_r'+str(round(res,2))
         else:
-            self.__model = unit+'_'+str(rx)+'x'+str(ry)+'x'+str(rz)+'_r'+str(round(res,2))+'_custom'
+            self.__model = unit+'_'+str(rx)+'x'+str(ry)+'x'+str(rz)+'_r'+str(round(res,2))+'_custom_eps'
 
         _x, _y, _z = np.meshgrid(_x/_res, _y/_res, _z/_res, indexing='ij')
-        self.__vox = np.fabs(self.__formula_string(_x,_y,_z))<=eps
+        self.__vox = np.fabs(self.__formula_string(_x,_y,_z))<=self.__eps
+        self.__porosity = 1-(np.sum(self.__vox)/self.__vox.size)
+        if self.__porosity == 0:
+            raise NameError('Didn\'t find matched material with {}'.format(self.__formula))
+
+    def update_eps(self, eps):
+
+        self.__eps=eps
+        rx,ry,rz = self.__r
+        _res=int(self.__l/self.__res)
+        _x=np.array([i for i in range(_res*rx)])
+        _y=np.array([i for i in range(_res*ry)])
+        _z=np.array([i for i in range(_res*rz)])
+
+        lx=len(_x)
+        ly=len(_y)
+        lz=len(_z)
+
+        _x, _y, _z = np.meshgrid(_x/_res, _y/_res, _z/_res, indexing='ij')
+        self.__vox = np.fabs(self.__formula_string(_x,_y,_z))<=self.__eps
         self.__porosity = 1-(np.sum(self.__vox)/self.__vox.size)
         if self.__porosity == 0:
             raise NameError('Didn\'t find matched material with {}'.format(self.__formula))
@@ -95,10 +115,11 @@ class SingleFormulaBasedMaterials:
             #%matplotlib inline
         os.makedirs(self.__model, exist_ok=True)
         with open(self.__model+"/info.txt",'w') as f:
-            print('L: {}'.format(self.__l), file=f)   
-            print('a: {}'.format(self.__a), file=f)            
             print('Formula: {}'.format(self.__formula), file=f)
             print('Porosity: {}'.format(self.__porosity), file=f)
+            print('L: {}'.format(self.__l), file=f)   
+            print('a: {}'.format(self.__a), file=f)
+            print('eps: {}'.format(self.__eps), file=f)
         for i in range(self.__vox.shape[0]):
             temp_img=self.__vox[i]
             plt.imsave(self.__model+'/'+str(i)+'.png', temp_img, cmap='gray')
