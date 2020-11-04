@@ -82,8 +82,10 @@ class SingleFormulaBasedMaterials:
         _x, _y, _z = np.meshgrid(_x/_res, _y/_res, _z/_res, indexing='ij')
         self.__vox = np.fabs(self.__formula_string(_x,_y,_z))<=self.__eps
         self.__porosity = 1-(np.sum(self.__vox)/self.__vox.size)
-        if self.__porosity == 0:
-            raise NameError('Didn\'t find matched material with {}'.format(self.__formula))
+        while np.abs(self.get_porosity() - 1)<1e-9:
+            self.__eps+=0.001
+            self.update_eps(self.__eps)
+            print('Didn\'t find matched material with {} and {}. Automatically use higher eps'.format(self.__formula, self.__eps))
 
     def update_eps(self, eps):
 
