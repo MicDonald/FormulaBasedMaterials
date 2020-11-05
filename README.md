@@ -1,9 +1,14 @@
 # FormulaBasedMaterials
 Generate Formula-Based Materials into Voxel, STL files
 
-# pip install FormulaBasedMaterials
+
 
 # Usage:
+
+```
+pip install FormulaBasedMaterials
+```
+
 ```python
 import matplotlib.pyplot as plt
 %matplotlib inline
