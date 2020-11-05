@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import os
 import trimesh  
 from mpl_toolkits.mplot3d import axes3d
-import os, time, warnings
+import time, warnings
 from skimage import measure
 import random
 from sympy import sympify
