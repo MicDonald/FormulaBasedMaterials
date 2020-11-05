@@ -4,8 +4,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pkg-FormulaBasedMaterials", # Replace with your own username
-    version="0.1.0",
+    name="FormulaBasedMaterials", # Replace with your own username
+    version="v0.1.0a2",
     author="Michael, Yu-Chuan, Hsu",
     author_email="mk60503mk60503@gmail.com",
     description="A code for generating Formula-Based Materials into Voxel, STL files.",
@@ -22,7 +22,6 @@ setuptools.setup(
         'numpy',
         'matplotlib',
         'trimesh',
-        'mpl_toolkits',
         'time',
         'warnings',
         'skimage',
