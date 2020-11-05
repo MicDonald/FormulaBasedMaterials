@@ -1,1 +1,1 @@
-from .SingleFormulaBasedMaterials import SingleFormulaBasedMaterials
+from .SingleFormulaBasedMaterial import SingleFormulaBasedMaterial

@@ -5,14 +5,14 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="FormulaBasedMaterials", # Replace with your own username
-    version="0.1.2",
+    version="0.1.7",
     license='MIT',
     author="Michael, Yu-Chuan, Hsu",
     author_email="mk60503mk60503@gmail.com",
     description="A code for generating Formula-Based Materials into Voxel, STL files.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    keywords=['Formula-Based', '3D printing', 'stl', 'voxel'],
+    keywords=['Formula-Based', '3D printing', 'stl', 'voxel', 'surface'],
     url="https://github.com/MicDonald/FormulaBasedMaterials",
     packages=setuptools.find_packages(),
     classifiers=[
