@@ -31,13 +31,13 @@ class SingleFormulaBasedMaterials:
 
         return formula
 
-    def __formula_string(self, _x,_y,_z):
+    def __formula_string(self):
         f = sympify(self.__formula)
         from sympy.abc import x, y, z
         from sympy.utilities.lambdify import lambdify
         f = lambdify([x,y,z], f, 'numpy')
 
-        return f(_x*np.pi*2/self.__a[0],_y*np.pi*2/self.__a[1],_z*np.pi*2/self.__a[2])
+        return f(self.__x*np.pi*2/self.__a[0],self.__y*np.pi*2/self.__a[1],self.__z*np.pi*2/self.__a[2])
     
     def __init__(self, unit=None, formula = None, l=10, r=[1,1,1], a=[1,1,1], eps=0.1, res=0.1, png=True, smooth=True):
         
@@ -63,69 +63,72 @@ class SingleFormulaBasedMaterials:
         print('Using formula:', self.__formula)
         rx,ry,rz = self.__r
         _res=int(self.__l/self.__res)
-        _x=np.array([i for i in range(_res*rx)])
-        _y=np.array([i for i in range(_res*ry)])
-        _z=np.array([i for i in range(_res*rz)])
+        self.__x=np.array([i for i in range(_res*rx)])
+        self.__y=np.array([i for i in range(_res*ry)])
+        self.__z=np.array([i for i in range(_res*rz)])
 
-        lx=len(_x)
-        ly=len(_y)
-        lz=len(_z)
+        lx=len(self.__x)
+        ly=len(self.__y)
+        lz=len(self.__z)
         
         if type(self.__eps)==float:
  
-            self.__model = unit+'_'+str(rx)+'x'+str(ry)+'x'+str(rz)+'_r'+str(round(res,2))
+            self._model = unit+'_'+str(rx)+'x'+str(ry)+'x'+str(rz)+'_r'+str(round(res,2))
         elif np.sum(eps/np.max(eps)-np.ones(eps.shape))==0:
 
-            self.__model = unit+'_'+str(rx)+'x'+str(ry)+'x'+str(rz)+'_r'+str(round(res,2))
+            self._model = unit+'_'+str(rx)+'x'+str(ry)+'x'+str(rz)+'_r'+str(round(res,2))
         else:
-            self.__model = unit+'_'+str(rx)+'x'+str(ry)+'x'+str(rz)+'_r'+str(round(res,2))+'_custom_eps'
+            self._model = unit+'_'+str(rx)+'x'+str(ry)+'x'+str(rz)+'_r'+str(round(res,2))+'_custom_eps'
 
-        _x, _y, _z = np.meshgrid(_x/_res, _y/_res, _z/_res, indexing='ij')
-        self.__vox = np.fabs(self.__formula_string(_x,_y,_z))<=self.__eps
-        self.__porosity = 1-(np.sum(self.__vox)/self.__vox.size)
-        while self.__porosity > 0.99:
+        self.__x, self.__y, self.__z = np.meshgrid(self.__x/_res, self.__y/_res, self.__z/_res, indexing='ij')
+        self._vox = self._buildvox()
+
+        while self.get_porosity() > 0.99:
             self.__eps+=0.001
             self.update_eps(self.__eps)
-            print('Finding matched material, but porosity: {} is too high. Update eps with {}'.format(self.__porosity, self.__eps))
+            print('Finding matched material, but porosity: {} is too high. Update eps with {}'.format(self.get_porosity(), self.__eps))
+
+    def _buildvox(self):
+        return np.fabs(self.__formula_string())<=self.__eps
 
     def update_eps(self, eps):
 
         self.__eps=eps
         rx,ry,rz = self.__r
         _res=int(self.__l/self.__res)
-        _x=np.array([i for i in range(_res*rx)])
-        _y=np.array([i for i in range(_res*ry)])
-        _z=np.array([i for i in range(_res*rz)])
+        self.__x=np.array([i for i in range(_res*rx)])
+        self.__y=np.array([i for i in range(_res*ry)])
+        self.__z=np.array([i for i in range(_res*rz)])
 
-        lx=len(_x)
-        ly=len(_y)
-        lz=len(_z)
+        lx=len(self.__x)
+        ly=len(self.__y)
+        lz=len(self.__z)
 
-        _x, _y, _z = np.meshgrid(_x/_res, _y/_res, _z/_res, indexing='ij')
-        self.__vox = np.fabs(self.__formula_string(_x,_y,_z))<=self.__eps
-        self.__porosity = 1-(np.sum(self.__vox)/self.__vox.size)
-        if self.__porosity == 0:
+        self.__x, self.__y, self.__z = np.meshgrid(self.__x/_res, self.__y/_res, self.__z/_res, indexing='ij')
+        self._vox = self._buildvox()
+        if self.get_porosity() == 0:
             raise NameError('Didn\'t find matched material with {}'.format(self.__formula))
     #======================================================================================================================
 
     def get_porosity(self):
-        return self.__porosity
-    
+        return 1-(np.sum(self._vox)/self._vox.size)
+    def get_vox(self):
+        return self._vox
     def get_formula(self):
         return self.__formula
     
     def save2stl(self):
             #%matplotlib inline
-        os.makedirs(self.__model, exist_ok=True)
-        with open(self.__model+"/info.txt",'w') as f:
+        os.makedirs(self._model, exist_ok=True)
+        with open(self._model+"/info.txt",'w') as f:
             print('Formula: {}'.format(self.__formula), file=f)
-            print('Porosity: {}'.format(self.__porosity), file=f)
+            print('Porosity: {}'.format(self.get_porosity()), file=f)
             print('L: {}'.format(self.__l), file=f)   
             print('a: {}'.format(self.__a), file=f)
             print('eps: {}'.format(self.__eps), file=f)
-        for i in range(self.__vox.shape[0]):
-            temp_img=self.__vox[i]
-            plt.imsave(self.__model+'/'+str(i)+'.png', temp_img, cmap='gray')
+        for i in range(self._vox.shape[0]):
+            temp_img=self._vox[i]
+            plt.imsave(self._model+'/'+str(i)+'.png', temp_img, cmap='gray')
             if self.__png:
                 from IPython import display
                 display.clear_output(wait=True)
@@ -134,14 +137,15 @@ class SingleFormulaBasedMaterials:
                 plt.title(str(i))
                 plt.show()
 
-        mesh = trimesh.voxel.ops.matrix_to_marching_cubes(self.__vox, pitch=self.__res)
+        mesh = trimesh.voxel.ops.matrix_to_marching_cubes(self._vox, pitch=self.__res)
 
         if self.__smooth:
             mesh = trimesh.smoothing.filter_humphrey(mesh)
 
         mesh.rezero()
-        mesh.export(self.__model+'/'+self.__model+'.stl')            
-        print('save stl model to {}'.format(self.__model))
+        mesh.export(self._model+'/'+self._model+'.stl')            
+        print('save stl model to {}'.format(self._model))
+
 if __name__=='__main__':
     
     try:
@@ -163,7 +167,7 @@ if __name__=='__main__':
         eps=args.eps
         smooth=args.smooth
         png=args.png
-        SFBM=SingleFormulaBasedMaterials(unit, l, r, a, eps, res, png, smooth)
-        SFBM.save2stl()
+        SingleFormulaBasedMaterials(unit, l, r, eps, res, png, smooth).save2stl()
+
     except:
         pass
