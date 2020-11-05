@@ -49,18 +49,21 @@ class SingleFormulaBasedMaterials:
         self.__png = png
         self.__smooth = smooth
 
-        if unit == 'gyroid':
-            self.__formula = self.__gyroid()
-        elif unit == 'SchD':
-            self.__formula = self.__SchD()
-        elif unit == 'random':
-            self.__formula = self.__randomFormulaString()
-        elif formula:
+        if formula:
             self.__formula = formula
             unit = 'user-defined'
+            
         else:
-            raise NameError('Please input user-defined formula')
-        print('Using formula:', self.__formula)
+            if unit == 'gyroid':
+                self.__formula = self.__gyroid()
+            elif unit == 'SchD':
+                self.__formula = self.__SchD()
+            else:
+                self.__formula = self.__randomFormulaString()
+                unit == 'random'
+     
+        print('Using formula: {}'.format(self.__formula))
+
         rx,ry,rz = self.__r
         _res=int(self.__l/self.__res)
         self.__x=np.array([i for i in range(_res*rx)])
@@ -108,6 +111,35 @@ class SingleFormulaBasedMaterials:
         self._vox = self._buildvox()
         if self.get_porosity() == 0:
             raise NameError('Didn\'t find matched material with {}'.format(self.__formula))
+        return self
+
+    def update_or(self, mix):
+        print('Initial porosity: {}'.format(self.get_porosity()))
+        self._vox = np.logical_or(self._vox, mix)
+        print('Final porosity after ''SUB'': {}'.format(self.get_porosity()))
+        self._model+='_OR'
+        return self
+
+    def update_xor(self, mix):
+        print('Initial porosity: {}'.format(self.get_porosity()))
+        self._vox = np.logical_xor(self._vox, mix)
+        print('Final porosity after ''SUB'': {}'.format(self.get_porosity()))
+        self._model+='_XOR'
+        return self
+
+    def update_sub(self, mix):
+        print('Initial porosity: {}'.format(self.get_porosity()))
+        self._vox = np.logical_xor(np.logical_or(self._vox, mix), mix)
+        print('Final porosity after ''SUB'': {}'.format(self.get_porosity()))
+        self._model+='_SUB'
+        return self
+
+    def update_and(self, mix):
+        print('Initial porosity: {}'.format(self.get_porosity()))
+        self._vox = np.logical_and(self._vox, mix)
+        print('Final porosity after ''SUB'': {}'.format(self.get_porosity()))
+        self._model+='_AND'
+        return self
     #======================================================================================================================
 
     def get_porosity(self):
