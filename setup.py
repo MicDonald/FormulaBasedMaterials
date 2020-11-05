@@ -4,8 +4,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="FormulaBasedMaterials", # Replace with your own username
-    version="v0.1.0a2",
+    name="FBM", # Replace with your own username
+    version="v0.1.0",
     author="Michael, Yu-Chuan, Hsu",
     author_email="mk60503mk60503@gmail.com",
     description="A code for generating Formula-Based Materials into Voxel, STL files.",
