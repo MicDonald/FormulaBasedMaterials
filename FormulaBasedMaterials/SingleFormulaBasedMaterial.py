@@ -151,8 +151,9 @@ class SingleFormulaBasedMaterial:
 
         mesh.rezero()
         if save:
-            os.makedirs('STL/'+self._model, exist_ok=True)
-            with open(self._model+"/info.txt",'w') as f:
+            loc='STL/'+self._model
+            os.makedirs(loc, exist_ok=True)
+            with open(loc+'/info.txt','w') as f:
                 print('Formula: {}'.format(self.__formula), file=f)
                 print('Porosity: {}'.format(self.get_porosity()), file=f)
                 print('L: {}'.format(self.__l), file=f)   
@@ -167,30 +168,31 @@ class SingleFormulaBasedMaterial:
                 plt.axis('off')
                 plt.title(str(i))
                 plt.show()
-            loc='STL/'+self._model+'/'+self._model+'.stl'
-            mesh.export(loc)   
-            print('save stl model to {}'.format(loc))
+            mesh.export(loc+'/'+self._model+'.stl')
+            print('save  stl model to {}'.format(loc))
         return mesh
 
     def formSurface(self, save=True):
 
         verts, faces, _, _ = measure.marching_cubes_lewiner(self.__formula_string(), 0, spacing=[self.__res]*3)
 
-        fig = plt.figure()
+        fig = plt.figure(figsize=(8,6))
         ax = fig.add_subplot(111, projection='3d')
         ax.plot_trisurf(verts[:, 0], verts[:, 1], faces, verts[:, 2])
-        plt.title(self.get_formula())
+        plt.title(sympify(self.get_formula()))
+        plt.tight_layout()
         plt.show()
         
         mesh = trimesh.base.Trimesh(vertices=verts, faces=faces)
         if save:
-            os.makedirs('STL/'+self._model, exist_ok=True)
-            with open(self._model+"/info_surface.txt",'w') as f:
+            loc='STL/'+self._model
+            os.makedirs(loc, exist_ok=True)
+            with open(loc+'/info_surface.txt','w') as f:
                 print('Formula: {}'.format(self.__formula), file=f)
                 print('L: {}'.format(self.__l), file=f)   
                 print('a: {}'.format(self.__a), file=f)
-            loc='STL/'+self._model+'/'+self._model+'.stl'
-            mesh.export(loc)
+            
+            mesh.export(loc+'/'+self._model+'_surface.stl')
             print('save surface stl model to {}'.format(loc))
         return mesh
 
@@ -226,7 +228,7 @@ if __name__=='__main__':
     except argparse.ArgumentError:
         pass
     except ValueError:
-        print('The formula-based material with {} and eps {} is not exist. Please try again.'.format(test.get_formula(), test.get_eps()))
+        print('The formula-based material with {} and eps {} does not exist. Please try again.'.format(test.get_formula(), test.get_eps()))
 
     
     
