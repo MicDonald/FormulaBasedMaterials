@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="FormulaBasedMaterials", # Replace with your own username
-    version="0.1.7",
+    version="0.1.8",
     license='MIT',
     author="Michael, Yu-Chuan, Hsu",
     author_email="mk60503mk60503@gmail.com",

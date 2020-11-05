@@ -151,7 +151,7 @@ class SingleFormulaBasedMaterial:
 
         mesh.rezero()
         if save:
-            os.makedirs(self._model, exist_ok=True)
+            os.makedirs('STL/'+self._model, exist_ok=True)
             with open(self._model+"/info.txt",'w') as f:
                 print('Formula: {}'.format(self.__formula), file=f)
                 print('Porosity: {}'.format(self.get_porosity()), file=f)
@@ -167,8 +167,9 @@ class SingleFormulaBasedMaterial:
                 plt.axis('off')
                 plt.title(str(i))
                 plt.show()
-            mesh.export(self._model+'/'+self._model+'.stl')   
-            print('save stl model to {}'.format(self._model))
+            loc='STL/'+self._model+'/'+self._model+'.stl'
+            mesh.export(loc)   
+            print('save stl model to {}'.format(loc))
         return mesh
 
     def formSurface(self, save=True):
@@ -183,13 +184,14 @@ class SingleFormulaBasedMaterial:
         
         mesh = trimesh.base.Trimesh(vertices=verts, faces=faces)
         if save:
-            os.makedirs(self._model, exist_ok=True)
+            os.makedirs('STL/'+self._model, exist_ok=True)
             with open(self._model+"/info_surface.txt",'w') as f:
                 print('Formula: {}'.format(self.__formula), file=f)
                 print('L: {}'.format(self.__l), file=f)   
                 print('a: {}'.format(self.__a), file=f)
-            mesh.export(self._model+'/'+self._model+'_surface.stl')
-            print('save surface stl model to {}'.format(self._model))
+            loc='STL/'+self._model+'/'+self._model+'.stl'
+            mesh.export(loc)
+            print('save surface stl model to {}'.format(loc))
         return mesh
 
 if __name__=='__main__':
