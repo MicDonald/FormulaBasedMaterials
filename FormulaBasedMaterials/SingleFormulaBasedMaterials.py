@@ -54,13 +54,13 @@ class SingleFormulaBasedMaterials:
             unit = 'user-defined'
             
         else:
-            if unit == 'gyroid':
+            if unit == 'Gyroid':
                 self.__formula = self.__gyroid()
             elif unit == 'SchD':
                 self.__formula = self.__SchD()
             else:
                 self.__formula = self.__randomFormulaString()
-                unit == 'random'
+                unit = 'random'
      
         print('Using formula: {}'.format(self.__formula))
 
@@ -74,14 +74,9 @@ class SingleFormulaBasedMaterials:
         ly=len(self.__y)
         lz=len(self.__z)
         
-        if type(self.__eps)==float:
- 
-            self._model = unit+'_'+str(rx)+'x'+str(ry)+'x'+str(rz)+'_r'+str(round(res,2))
-        elif np.sum(eps/np.max(eps)-np.ones(eps.shape))==0:
-
-            self._model = unit+'_'+str(rx)+'x'+str(ry)+'x'+str(rz)+'_r'+str(round(res,2))
-        else:
-            self._model = unit+'_'+str(rx)+'x'+str(ry)+'x'+str(rz)+'_r'+str(round(res,2))+'_custom_eps'
+        self._model = '{}_{}x{}x{}_r{:.1f}'.format(unit,rx,ry,rz,self.__res)
+        if type(self.__eps) is not float:
+            self._model += '_custom_eps'
 
         self.__x, self.__y, self.__z = np.meshgrid(self.__x/_res, self.__y/_res, self.__z/_res, indexing='ij')
         self._vox = self._buildvox()
@@ -180,26 +175,28 @@ class SingleFormulaBasedMaterials:
 
 if __name__=='__main__':
     
-    try:
-        import argparse
-        parser = argparse.ArgumentParser(description='generate stl by function')
-        parser.add_argument('--r', nargs=3, type=int, default=[1,1,1])
-        parser.add_argument('--res', type=float, default=1.0)
-        parser.add_argument('--l', type=float, default=10)
-        parser.add_argument('--eps', type=float, default=0.5)
-        parser.add_argument('--unit', type=str, default='gyroid')
-        parser.add_argument('--smooth', type=bool, default=True)
-        parser.add_argument('--png', type=bool, default=False)
-        args = parser.parse_args()
-    
-        res=args.res # mm/pixel
-        l=args.l # 1 unit => 10*10*10mm
-        r=args.r # [2,7,7]
-        unit=args.unit #'gyroid'
-        eps=args.eps
-        smooth=args.smooth
-        png=args.png
-        SingleFormulaBasedMaterials(unit, l, r, eps, res, png, smooth).save2stl()
+    # try:
+    import argparse
+    parser = argparse.ArgumentParser(description='generate stl by function')
+    parser.add_argument('--unit', type=str, default='')
+    parser.add_argument('--formula', type=str, default=None)
+    parser.add_argument('--l', type=float, default=10)
+    parser.add_argument('--r', nargs=3, type=int, default=[1,1,1])
+    parser.add_argument('--eps', type=float, default=0.5)
+    parser.add_argument('--res', type=float, default=1.0)
+    parser.add_argument('--png', type=bool, default=False)
+    parser.add_argument('--smooth', type=bool, default=True)
+    args = parser.parse_args()
 
-    except:
-        pass
+    unit=args.unit #'gyroid'
+    formula=args.formula #''
+    l=args.l # 1 unit => 10*10*10mm
+    r=args.r # [1,1,1]
+    eps=args.eps
+    res=args.res # mm/pixel
+    smooth=args.smooth
+    png=args.png
+    SingleFormulaBasedMaterials(unit=unit, formula=formula, l=l, r=r, eps=eps, res=res, png=png, smooth=smooth).save2stl()
+
+    # except:
+    #     pass
