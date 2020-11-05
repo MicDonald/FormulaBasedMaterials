@@ -161,7 +161,7 @@ class SingleFormulaBasedMaterial:
                 print('eps: {}'.format(self.__eps), file=f)
             for i in range(self._vox.shape[0]):
                 temp_img=self._vox[i]
-                plt.imsave(self._model+'/'+str(i)+'.png', temp_img, cmap='gray')
+                plt.imsave(loc+'/'+str(i)+'.png', temp_img, cmap='gray')
                 from IPython import display
                 display.clear_output(wait=True)
                 plt.imshow(temp_img, cmap='gray')    
@@ -169,7 +169,7 @@ class SingleFormulaBasedMaterial:
                 plt.title(str(i))
                 plt.show()
             mesh.export(loc+'/'+self._model+'.stl')
-            print('save  stl model to {}'.format(loc))
+            print('save stl model to {}'.format(loc))
         return mesh
 
     def formSurface(self, save=True):
