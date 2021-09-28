@@ -151,7 +151,10 @@ class SingleFormulaBasedMaterial:
 
         mesh.rezero()
         if save:
-            loc='STL/'+self._model
+
+            from time import strftime
+            stamp = strftime("%m_%d_%H_%M")
+            loc='STL/'+self._model+'_'+stamp
             os.makedirs(loc, exist_ok=True)
             with open(loc+'/info.txt','w') as f:
                 print('Formula: {}'.format(self.__formula), file=f)
